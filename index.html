@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            background-color: #ffeef8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff4d6d;
+            font-size: 3rem;
+            text-shadow: 2px 2px #ffb3c1;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #yesBtn {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        #noBtn {
+            background-color: #808080;
+            color: white;
+            position: absolute;
+        }
+
+        .decor {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+        }
+
+        /* Success Page Styles */
+        #success-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffeef8;
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .big-heart {
+            font-size: 10rem;
+            animation: beat 0.8s infinite;
+        }
+
+        @keyframes beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .burst-heart {
+            position: absolute;
+            color: #ff4d6d;
+            animation: fly 2s linear forwards;
+        }
+
+        @keyframes fly {
+            to {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-screen">
+        <h1>Will you be my valentine? 💖</h1>
+        <p style="color: #ff758f;">(Say yes, please!)</p>
+        
+        <div class="buttons">
+            <button id="yesBtn" onclick="showSuccess()">Yes!</button>
+            <button id="noBtn" onmouseover="moveButton()">No</button>
+        </div>
+
+        <div class="decor" style="top: 10%; left: 10%;">🌸</div>
+        <div class="decor" style="top: 20%; right: 15%;">✨</div>
+        <div class="decor" style="bottom: 15%; left: 20%;">🧸</div>
+        <div class="decor" style="bottom: 10%; right: 10%;">🎀</div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">YAY! See you soon! 🥰</h1>
+        <div class="big-heart">❤️</div>
+    </div>
+
+    <script>
+        // Move the "No" button away
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+            
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        // Show success and trigger heart burst
+        function showSuccess() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+            
+            for (let i = 0; i < 50; i++) {
+                createHeart();
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('burst-heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = '50%';
+            heart.style.top = '50%';
+            
+            // Random direction for the burst
+            const x = (Math.random() - 0.5) * 1000 + 'px';
+            const y = (Math.random() - 0.5) * 1000 + 'px';
+            heart.style.setProperty('--x', x);
+            heart.style.setProperty('--y', y);
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
