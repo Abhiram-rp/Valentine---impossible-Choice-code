@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Be My Valentine?</title>
     <style>
+        /* Mobile Block Style */
+        #mobile-block {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffeef8;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            #mobile-block { display: flex; }
+        }
+
         body {
             background-color: #ffeef8;
             display: flex;
@@ -21,18 +39,14 @@
 
         #audio-control {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             z-index: 1000;
             background: white;
             border: 2px solid #ff4d6d;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
@@ -51,29 +65,45 @@
 
         #success-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffeef8; z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
 
-        .big-heart { font-size: 12rem; animation: beat 0.6s infinite; filter: drop-shadow(0 0 20px #ff4d6d); }
+        .big-heart { font-size: 10rem; animation: beat 0.6s infinite; filter: drop-shadow(0 0 20px #ff4d6d); }
 
         @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        .burst-heart { position: absolute; pointer-events: none; z-index: 999; font-size: 2rem; animation: fly 1.5s ease-out forwards; }
+        /* Dove Animation */
+        .dove {
+            position: absolute;
+            font-size: 3rem;
+            pointer-events: none;
+            z-index: 101;
+            animation: flyAway 4s ease-in forwards;
+        }
 
+        @keyframes flyAway {
+            0% { bottom: 20%; left: 50%; transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { bottom: 120%; left: 120%; transform: scale(0.5) rotate(20deg); opacity: 0; }
+        }
+
+        .burst-heart { position: absolute; pointer-events: none; z-index: 999; font-size: 2rem; animation: fly 1.5s ease-out forwards; }
         @keyframes fly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
 
         .decor { position: absolute; font-size: 2.5rem; pointer-events: none; opacity: 0.6; }
-
-        /* Hide the YouTube player */
         #youtube-player { position: absolute; top: -9999px; left: -9999px; }
     </style>
 </head>
 <body onclick="handleClick(event)">
 
-    <div id="youtube-player"></div>
+    <div id="mobile-block">
+        <h1 style="font-size: 2rem;">Hehe, nice try! 💝</h1>
+        <p style="color: #ff4d6d;">This surprise is too big for a tiny screen.<br><b>Please open this on a Laptop or PC!</b></p>
+        <div style="font-size: 4rem;">💻✨</div>
+    </div>
 
+    <div id="youtube-player"></div>
     <button id="audio-control" onclick="toggleMusic(event)">🔊</button>
 
     <div id="main-screen">
-        <h1>You + me, Valentine’s ? 💖</h1>
-        <p style="color: #ff758f; font-size: 1.2rem;">No pressure...Say Yes 😉</p>
+        <h1>Will you be my valentine? 💖</h1>
+        <p style="color: #ff758f; font-size: 1.2rem;">Choose wisely... 😉</p>
         <div class="buttons">
             <button id="yesBtn" onclick="showSuccess(event)">Yes!</button>
             <button id="noBtn" onmouseover="moveButton()">No</button>
@@ -85,7 +115,7 @@
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 4rem;">If you let me borrow a kiss,<br> I promise I'll give it right back! 🥰</h1>
+        <h1 style="font-size: 3rem; line-height: 1.2;">If you let me borrow a kiss,<br>I promise I'll give it right back! 🥰</h1>
         <div class="big-heart">❤️</div>
         <p style="color: #ff4d6d; margin-top: 20px;">(Click anywhere for more love!)</p>
     </div>
@@ -94,7 +124,6 @@
         let isSuccess = false;
         let player;
 
-        // Load YouTube API
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -102,23 +131,18 @@
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
-                height: '0',
-                width: '0',
-                videoId: 'e8e2L5u1Bb0', // Your video ID
-                events: {
-                    'onReady': onPlayerReady
-                }
+                height: '0', width: '0',
+                videoId: 'e8e2L5u1Bb0',
+                events: { 'onReady': onPlayerReady }
             });
         }
 
-        function onPlayerReady(event) {
-            // Player is ready, but won't play until user clicks
-        }
+        function onPlayerReady(event) {}
 
         function toggleMusic(e) {
             e.stopPropagation();
             const audioBtn = document.getElementById('audio-control');
-            if (player.getPlayerState() === 1) { // 1 is Playing
+            if (player.getPlayerState() === 1) {
                 player.pauseVideo();
                 audioBtn.innerText = '🔈';
             } else {
@@ -134,8 +158,6 @@
             const y = Math.random() * (window.innerHeight - btn.offsetHeight - padding);
             btn.style.left = Math.max(padding, x) + 'px';
             btn.style.top = Math.max(padding, y) + 'px';
-            
-            // Try playing on hover if not already
             if (player && player.playVideo) player.playVideo();
         }
 
@@ -144,6 +166,13 @@
             isSuccess = true;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
+            
+            // Create Flying Dove
+            const dove = document.createElement('div');
+            dove.className = 'dove';
+            dove.innerHTML = '🕊️';
+            document.body.appendChild(dove);
+
             if (player && player.playVideo) player.playVideo();
             for (let i = 0; i < 40; i++) createHeart(window.innerWidth / 2, window.innerHeight / 2);
         }
@@ -152,7 +181,6 @@
             if (isSuccess) {
                 for (let i = 0; i < 12; i++) createHeart(e.clientX, e.clientY);
             }
-            // Ensure music plays on first click anywhere
             if (player && player.playVideo) player.playVideo();
         }
 
