@@ -16,7 +16,27 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             text-align: center;
+            /* Heart cursor */
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="font-size: 20px;"><text y="15">💖</text></svg>'), auto;
+        }
+
+        /* Music Toggle Button */
+        #audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #ff4d6d;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         h1 {
@@ -65,7 +85,6 @@
             z-index: 10;
         }
 
-        /* Success Page Styles */
         #success-screen {
             display: none;
             position: fixed;
@@ -110,6 +129,12 @@
 </head>
 <body onclick="handleClick(event)">
 
+    <audio id="bgMusic" loop>
+        <source src="https://youtu.be/e8e2L5u1Bb0?si=fyDXLXDxdlmzaWgd" type="audio/mpeg">
+    </audio>
+
+    <button id="audio-control" onclick="toggleMusic(event)">🔊</button>
+
     <div id="main-screen">
         <h1>Will you be my valentine? 💖</h1>
         <p style="color: #ff758f; font-size: 1.2rem;">Choose wisely... 😉</p>
@@ -133,24 +158,46 @@
 
     <script>
         let isSuccess = false;
+        const music = document.getElementById('bgMusic');
+        const audioBtn = document.getElementById('audio-control');
+
+        // Play music on first interaction (required by browsers)
+        window.addEventListener('click', () => {
+            if (music.paused && audioBtn.innerText === '🔊') {
+                music.play();
+            }
+        }, { once: true });
+
+        function toggleMusic(e) {
+            e.stopPropagation();
+            if (music.paused) {
+                music.play();
+                audioBtn.innerText = '🔊';
+            } else {
+                music.pause();
+                audioBtn.innerText = '🔈';
+            }
+        }
 
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            const padding = 50;
+            const padding = 100;
             const x = Math.random() * (window.innerWidth - btn.offsetWidth - padding);
             const y = Math.random() * (window.innerHeight - btn.offsetHeight - padding);
             
             btn.style.left = Math.max(padding, x) + 'px';
             btn.style.top = Math.max(padding, y) + 'px';
+            
+            // Start music if it hasn't started yet
+            if (music.paused && audioBtn.innerText === '🔊') music.play();
         }
 
         function showSuccess(e) {
-            e.stopPropagation(); // Prevents double burst on the first click
+            e.stopPropagation();
             isSuccess = true;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
             
-            // Initial giant burst
             for (let i = 0; i < 40; i++) {
                 createHeart(window.innerWidth / 2, window.innerHeight / 2);
             }
@@ -158,8 +205,7 @@
 
         function handleClick(e) {
             if (isSuccess) {
-                // Create a burst of 10 hearts at the click location
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 12; i++) {
                     createHeart(e.clientX, e.clientY);
                 }
             }
@@ -168,27 +214,19 @@
         function createHeart(x, y) {
             const heart = document.createElement('div');
             heart.classList.add('burst-heart');
-            
-            // Randomly pick a heart style
-            const hearts = ['❤️', '💖', '💝', '💕', '💗'];
+            const hearts = ['❤️', '💖', '💝', '💕', '💗', '🌸'];
             heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
-            
             heart.style.left = x + 'px';
             heart.style.top = y + 'px';
             
-            // Random trajectory
-            const destinationX = (Math.random() - 0.5) * 400 + 'px';
-            const destinationY = (Math.random() - 0.5) * 400 + 'px';
+            const destinationX = (Math.random() - 0.5) * 600 + 'px';
+            const destinationY = (Math.random() - 0.5) * 600 + 'px';
             
             heart.style.setProperty('--x', destinationX);
             heart.style.setProperty('--y', destinationY);
             
             document.body.appendChild(heart);
-            
-            // Cleanup memory
-            setTimeout(() => {
-                heart.remove();
-            }, 1500);
+            setTimeout(() => heart.remove(), 1500);
         }
     </script>
 </body>
