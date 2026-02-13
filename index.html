@@ -13,21 +13,17 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             text-align: center;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="font-size: 20px;"><text y="15">💖</text></svg>'), auto;
         }
 
         h1 {
             color: #ff4d6d;
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3.5rem);
             text-shadow: 2px 2px #ffb3c1;
-        }
-
-        .container {
-            position: relative;
-            width: 100%;
-            height: 300px;
+            margin-bottom: 10px;
         }
 
         .buttons {
@@ -35,34 +31,38 @@
             gap: 20px;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 30px;
+            height: 100px;
         }
 
         button {
-            padding: 15px 30px;
+            padding: 15px 40px;
             font-size: 1.5rem;
             border-radius: 50px;
             border: none;
             cursor: pointer;
-            transition: transform 0.2s;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         #yesBtn {
             background-color: #ff4d6d;
             color: white;
             box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         #noBtn {
             background-color: #808080;
             color: white;
             position: absolute;
-        }
-
-        .decor {
-            position: absolute;
-            font-size: 2rem;
-            pointer-events: none;
+            z-index: 10;
         }
 
         /* Success Page Styles */
@@ -81,38 +81,41 @@
         }
 
         .big-heart {
-            font-size: 10rem;
-            animation: beat 0.8s infinite;
+            font-size: 12rem;
+            animation: beat 0.6s infinite;
+            filter: drop-shadow(0 0 20px #ff4d6d);
         }
 
         @keyframes beat {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
 
         .burst-heart {
             position: absolute;
-            color: #ff4d6d;
-            animation: fly 2s linear forwards;
+            pointer-events: none;
+            z-index: 999;
+            font-size: 2rem;
+            animation: fly 1.5s ease-out forwards;
         }
 
         @keyframes fly {
-            to {
-                transform: translate(var(--x), var(--y)) scale(0);
-                opacity: 0;
-            }
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
         }
+
+        .decor { position: absolute; font-size: 2.5rem; pointer-events: none; opacity: 0.6; }
     </style>
 </head>
-<body>
+<body onclick="handleClick(event)">
 
     <div id="main-screen">
         <h1>Will you be my valentine? 💖</h1>
-        <p style="color: #ff758f;">(Say yes, please!)</p>
+        <p style="color: #ff758f; font-size: 1.2rem;">Choose wisely... 😉</p>
         
         <div class="buttons">
-            <button id="yesBtn" onclick="showSuccess()">Yes!</button>
+            <button id="yesBtn" onclick="showSuccess(event)">Yes!</button>
             <button id="noBtn" onmouseover="moveButton()">No</button>
         </div>
 
@@ -123,49 +126,69 @@
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 4rem;">YAY! See you soon! 🥰</h1>
+        <h1 style="font-size: 4rem;">I KNEW IT! 🥰</h1>
         <div class="big-heart">❤️</div>
+        <p style="color: #ff4d6d; margin-top: 20px;">(Click anywhere for more love!)</p>
     </div>
 
     <script>
-        // Move the "No" button away
+        let isSuccess = false;
+
         function moveButton() {
             const btn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+            const padding = 50;
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - padding);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - padding);
             
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+            btn.style.left = Math.max(padding, x) + 'px';
+            btn.style.top = Math.max(padding, y) + 'px';
         }
 
-        // Show success and trigger heart burst
-        function showSuccess() {
+        function showSuccess(e) {
+            e.stopPropagation(); // Prevents double burst on the first click
+            isSuccess = true;
             document.getElementById('main-screen').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
             
-            for (let i = 0; i < 50; i++) {
-                createHeart();
+            // Initial giant burst
+            for (let i = 0; i < 40; i++) {
+                createHeart(window.innerWidth / 2, window.innerHeight / 2);
             }
         }
 
-        function createHeart() {
+        function handleClick(e) {
+            if (isSuccess) {
+                // Create a burst of 10 hearts at the click location
+                for (let i = 0; i < 10; i++) {
+                    createHeart(e.clientX, e.clientY);
+                }
+            }
+        }
+
+        function createHeart(x, y) {
             const heart = document.createElement('div');
             heart.classList.add('burst-heart');
-            heart.innerHTML = '❤️';
-            heart.style.left = '50%';
-            heart.style.top = '50%';
             
-            // Random direction for the burst
-            const x = (Math.random() - 0.5) * 1000 + 'px';
-            const y = (Math.random() - 0.5) * 1000 + 'px';
-            heart.style.setProperty('--x', x);
-            heart.style.setProperty('--y', y);
+            // Randomly pick a heart style
+            const hearts = ['❤️', '💖', '💝', '💕', '💗'];
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+            
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            
+            // Random trajectory
+            const destinationX = (Math.random() - 0.5) * 400 + 'px';
+            const destinationY = (Math.random() - 0.5) * 400 + 'px';
+            
+            heart.style.setProperty('--x', destinationX);
+            heart.style.setProperty('--y', destinationY);
             
             document.body.appendChild(heart);
             
+            // Cleanup memory
             setTimeout(() => {
                 heart.remove();
-            }, 2000);
+            }, 1500);
         }
     </script>
 </body>
